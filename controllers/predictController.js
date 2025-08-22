@@ -11,29 +11,34 @@ exports.getPrediction = async (req, res) => {
             return res.status(400).json({ success: false, message: "Image ID is required." });
         }
 
-        // Fetch the image URL from your database using the ID.
         const imageRecord = await Image.findById(image_id);
         if (!imageRecord) {
             return res.status(404).json({ success: false, message: "Image not found." });
         }
         const imageUrl = imageRecord.url;
 
-        // Make the API call to Shubham's ML model
-        // We will send the image URL in the body.
-        const mlResponse = await axios.post(
-            process.env.ML_API_URL, 
-            { imageUrl: imageUrl } // Send the URL in a JSON body
-        );
+        // Mock response that now includes a suggestions field
+        const mlResponse = {
+            data: {
+                prediction: {
+                    crop: "Sugarcane",
+                    disease: "Bacterial Blight"
+                },
+                confidence: 0.3289335370063782,
+                suggestions: "Provide adequate air circulation by spacing plants appropriately. Apply a copper-based fungicide to affected areas. Remove and destroy severely infected plants to prevent the spread of the disease."
+            }
+        };
 
-        // Extract the data from the response based on the ML model's output
-        const { disease, confidence, explanation } = mlResponse.data;
+        // Correctly destructure the nested prediction object
+        const { prediction, confidence, suggestions } = mlResponse.data;
+        const { disease, crop } = prediction;
 
-        // Save the actual prediction result to your database
         const newPrediction = await Prediction.create(
             image_id,
             disease,
             confidence,
-            explanation
+            crop, // Saving crop in the explanation column
+            suggestions
         );
 
         res.status(200).json({

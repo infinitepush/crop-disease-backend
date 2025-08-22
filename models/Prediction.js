@@ -2,10 +2,10 @@
 const pool = require("../config/db");
 
 class Prediction {
-  static async create(image_id, disease, confidence, explanation) {
+  static async create(image_id, disease, confidence, explanation, suggestions) {
     const result = await pool.query(
-      "INSERT INTO predictions (image_id, disease, confidence, explanation) VALUES ($1, $2, $3, $4) RETURNING *",
-      [image_id, disease, confidence, explanation]
+      "INSERT INTO predictions (image_id, disease, confidence, explanation, suggestions) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [image_id, disease, confidence, explanation, suggestions]
     );
     return result.rows[0];
   }
