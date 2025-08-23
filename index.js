@@ -2,11 +2,13 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const pool = require("./config/db"); // Import your database connection pool
+const pool = require("./config/db");
 
 const uploadRoutes = require("./routes/upload");
 const predictRoutes = require("./routes/predict");
 const feedbackRoutes = require("./routes/feedback");
+const historyRoutes = require("./routes/history");
+const authRoutes = require("./routes/auth"); // Import the new auth route
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,28 +22,25 @@ app.get("/", (req, res) => {
     res.json({ message: "🌱 Crop Disease Backend is running 🚀" });
 });
 
-// Use the routes without the extra prefix
+// Use the routes
 app.use("/upload", uploadRoutes);
 app.use("/predict", predictRoutes);
 app.use("/feedback", feedbackRoutes);
+app.use("/", historyRoutes);
+app.use("/", authRoutes); // Add the new auth route
 
 // Function to start the server after a successful database connection
 const startServer = async () => {
     try {
-        // Attempt to connect to the database by executing a simple query
         await pool.query('SELECT NOW()');
         console.log('✅ Connected to PostgreSQL database');
-
-        // Start the server only after a successful DB connection
         app.listen(PORT, () => {
             console.log(`🚀 Backend running on port ${PORT}`);
         });
     } catch (error) {
-        // Log the error and exit the process if the connection fails
         console.error('❌ Database connection failed:', error.stack);
         process.exit(1); 
     }
 };
 
-// Call the function to start the server
 startServer();

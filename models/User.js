@@ -1,0 +1,21 @@
+// models/User.js
+const pool = require("../config/db");
+
+class User {
+    // Finds a user by their email
+    static async findByEmail(email) {
+        const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        return result.rows[0];
+    }
+
+    // Creates a new user in the database
+    static async create(fullname, email, passwordHash, phone) {
+        const result = await pool.query(
+            "INSERT INTO users (fullname, email, password_hash, phone) VALUES ($1, $2, $3, $4) RETURNING *",
+            [fullname, email, passwordHash, phone]
+        );
+        return result.rows[0];
+    }
+}
+
+module.exports = User;
