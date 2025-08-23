@@ -1,7 +1,8 @@
 // controllers/predictController.js
 const axios = require("axios");
 const Prediction = require("../models/Prediction");
-const Image = require("../models/Image"); 
+const Image = require("../models/Image");
+const Suggestion = require("../models/Suggestion"); // new model
 
 exports.getPrediction = async (req, res) => {
     try {
@@ -17,7 +18,7 @@ exports.getPrediction = async (req, res) => {
         }
         const imageUrl = imageRecord.url;
 
-        // Mock response that now includes a suggestions field
+        // Mock ML response (later replace with real ML API call)
         const mlResponse = {
             data: {
                 prediction: {
@@ -25,26 +26,33 @@ exports.getPrediction = async (req, res) => {
                     disease: "Bacterial Blight"
                 },
                 confidence: 0.3289335370063782,
-                suggestions: "Provide adequate air circulation by spacing plants appropriately. Apply a copper-based fungicide to affected areas. Remove and destroy severely infected plants to prevent the spread of the disease."
+                suggestions: "Provide adequate air circulation by spacing plants appropriately. Apply a copper-based fungicide. Remove and destroy severely infected plants."
             }
         };
 
-        // Correctly destructure the nested prediction object
+        // Extract fields
         const { prediction, confidence, suggestions } = mlResponse.data;
         const { disease, crop } = prediction;
 
+        // 1. Save prediction in DB
         const newPrediction = await Prediction.create(
             image_id,
             disease,
             confidence,
-            crop, // Saving crop in the explanation column
+            crop // store crop name in explanation for now
+        );
+
+        // 2. Save suggestion linked to prediction
+        const newSuggestion = await Suggestion.create(
+            newPrediction.id,
             suggestions
         );
 
         res.status(200).json({
             success: true,
-            message: "Prediction successful and saved to database.",
-            prediction: newPrediction
+            message: "Prediction and suggestion saved.",
+            prediction: newPrediction,
+            suggestion: newSuggestion
         });
 
     } catch (error) {
