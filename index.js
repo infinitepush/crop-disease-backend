@@ -1,7 +1,10 @@
+// index.js
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+// Import all route files
 const uploadRoutes = require("./routes/upload");
 const predictRoutes = require("./routes/predict");
 const feedbackRoutes = require("./routes/feedback");
@@ -19,28 +22,28 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health check
 app.get("/", (req, res) => {
-  res.json({ message: "🌱 Crop Disease Backend is running 🚀" });
+    res.json({ message: "🌱 Crop Disease Backend is running 🚀" });
 });
 
-// Routes
+// Routes with consistent pathing
 app.use("/upload", uploadRoutes);
 app.use("/predict", predictRoutes);
 app.use("/feedback", feedbackRoutes);
-app.use("/", historyRoutes);
-app.use("/", authRoutes);
+app.use("/history", historyRoutes);
+app.use("/auth", authRoutes);
 
 // Start server after DB connection
 const startServer = async () => {
-  try {
-    await pool.query("SELECT NOW()");
-    console.log("✅ Connected to PostgreSQL database");
-    app.listen(PORT, () => {
-      console.log(`🚀 Backend running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error("❌ Database connection failed:", error.stack);
-    process.exit(1);
-  }
+    try {
+        await pool.query("SELECT NOW()"); // A simple query to check the connection
+        console.log("✅ Database connection successful.");
+        app.listen(PORT, () => {
+            console.log(`🚀 Backend running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("❌ Database connection failed:", error.stack);
+        process.exit(1);
+    }
 };
 
 startServer();

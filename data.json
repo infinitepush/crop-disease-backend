@@ -1,3 +1,18 @@
-{
-  "image_id": 1
-}
+[
+  {
+    "disease": "Bacterial Blight",
+    "explanation": "Apply copper fungicide and remove infected plants to prevent spreading."
+  },
+  {
+    "disease": "Leaf Blight",
+    "explanation": "Use a fungicide, improve air circulation, and prune affected leaves."
+  },
+  {
+    "disease": "Healthy",
+    "explanation": "Your crop is healthy! Maintain regular watering and fertilization."
+  },
+  {
+    "disease": "Rust",
+    "explanation": "Remove and destroy infected leaves. Use a sulfur-based fungicide."
+  }
+]

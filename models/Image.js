@@ -5,15 +5,12 @@ class Image {
   static async create(url) {
     const result = await pool.query(
       "INSERT INTO images (url) VALUES ($1) RETURNING *",
-      [url]
+      [url] // Ensure this is just the string, not a JSON object
     );
     return result.rows[0];
   }
 
-  static async findById(id) {
-    const result = await pool.query("SELECT * FROM images WHERE id = $1", [id]);
-    return result.rows[0];
-  }
+  // ... rest of the file
 }
 
 module.exports = Image;

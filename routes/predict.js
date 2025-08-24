@@ -1,24 +1,17 @@
 // routes/predict.js
 const express = require("express");
-const multer = require("multer");
-const {
-  getPrediction,
-  createPrediction,
-  getPredictionWithSuggestion,
-} = require("../controllers/predictController");
+// Import the corrected getPrediction and getSavedPrediction controllers
+const { getPrediction, getSavedPrediction } = require("../controllers/predictController");
 
 const router = express.Router();
 
-// Multer config for file uploads
-const upload = multer({ dest: "uploads/" }); // temporary folder
+// This route is for getting a new prediction from the AI model
+// The image ID is received from a prior upload
+// Example: POST /api/predict/123
+router.post("/:imageId", getPrediction);
 
-// POST: Run prediction + store results (frontend calls /predict-back)
-router.post("/predict-back", upload.single("file"), createPrediction);
-
-// GET: Retrieve prediction + suggestion by image ID
-router.get("/:imageId", getPredictionWithSuggestion);
-
-// Optional old prediction route
-router.post("/old", getPrediction);
+// This is an optional route for fetching a previously saved prediction
+// Example: GET /api/predict/saved/123
+router.get("/saved/:predictionId", getSavedPrediction);
 
 module.exports = router;

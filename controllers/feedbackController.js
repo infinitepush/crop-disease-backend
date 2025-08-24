@@ -1,5 +1,5 @@
 // controllers/feedbackController.js
-const Feedback = require("../models/Feedback"); // Corrected path to the Feedback model
+const Feedback = require("../models/Feedback");
 
 // Controller function for saving user feedback
 exports.submitFeedback = async (req, res) => {
@@ -11,8 +11,13 @@ exports.submitFeedback = async (req, res) => {
             return res.status(400).json({ success: false, message: "Prediction ID and is_correct status are required." });
         }
 
-        // Save the feedback to the database using your Feedback model
-        const newFeedback = await Feedback.create(prediction_id, is_correct, notes);
+        // **FIX:** Pass the data as a single object to the create method.
+        // The keys in the object should match the column names in your 'feedback' table.
+        const newFeedback = await Feedback.create({
+            prediction_id: prediction_id,
+            is_correct: is_correct,
+            notes: notes
+        });
 
         res.status(201).json({
             success: true,
