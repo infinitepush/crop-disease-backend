@@ -16,8 +16,8 @@ exports.signup = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
 
-        // **CORRECTED:** Pass the data as a single object to the User.create method.
-        const newUser = await User.create({ fullname, email, passwordHash, phone });
+        // **CORRECTED:** Pass the data as individual arguments to the User.create method.
+        const newUser = await User.create(fullname, email, passwordHash, phone);
 
         res.status(201).json({ success: true, message: "User created successfully.", user: newUser });
     } catch (error) {
