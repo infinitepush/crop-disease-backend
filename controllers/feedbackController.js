@@ -11,13 +11,14 @@ exports.submitFeedback = async (req, res) => {
             return res.status(400).json({ success: false, message: "Prediction ID and is_correct status are required." });
         }
 
-        // **FIX:** Pass the data as a single object to the create method.
-        // The keys in the object should match the column names in your 'feedback' table.
-        const newFeedback = await Feedback.create({
-            prediction_id: prediction_id,
-            is_correct: is_correct,
-            notes: notes
-        });
+        // **FIX:** Parse prediction_id to integer and pass all arguments individually.
+        const parsedPredictionId = parseInt(prediction_id, 10);
+        
+        if (isNaN(parsedPredictionId)) {
+            return res.status(400).json({ success: false, message: "Prediction ID must be a number." });
+        }
+
+        const newFeedback = await Feedback.create(parsedPredictionId, is_correct, notes);
 
         res.status(201).json({
             success: true,
