@@ -33,7 +33,7 @@ exports.createPrediction = async (req, res) => {
       }
     };
 
-    const { prediction, confidence, suggestions } = mlResponse.data;
+    const { prediction, confidence, Suggestions } = mlResponse.data;
     const { disease, crop } = prediction;
 
     // Save prediction
@@ -45,7 +45,7 @@ exports.createPrediction = async (req, res) => {
     );
 
     // Save suggestion
-    const newSuggestion = await Suggestion.create(newPrediction.id, suggestions);
+    const newSuggestion = await Suggestion.create(newPrediction.id, Suggestions);
 
     // Optional: remove uploaded file after processing
     fs.unlinkSync(file.path);

@@ -8,7 +8,7 @@ class Suggestion {
             `INSERT INTO suggestions (prediction_id, suggestion)
              VALUES ($1, $2)
              RETURNING *`,
-            [prediction_id, suggestion]
+            [prediction_id, Suggestion]
         );
         return result.rows[0];
     }
