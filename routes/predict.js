@@ -1,18 +1,13 @@
 const express = require("express");
 const multer = require("multer");
-
-router.post("/predict-back", upload.single("file"), createPrediction);
-
 const {
   getPrediction,
   createPrediction,
   getPredictionWithSuggestion,
 } = require("../controllers/predictController");
 
-const router = express.Router();
-
-// Multer config for file uploads
-const upload = multer({ dest: "uploads/" }); // temporary folder for uploaded images
+const router = express.Router(); // ✅ declare router first
+const upload = multer({ dest: "uploads/" }); // ✅ declare multer before using it
 
 // POST: Run prediction + store results (matches frontend /predict-back)
 router.post("/predict-back", upload.single("file"), createPrediction);
