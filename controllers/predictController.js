@@ -1,12 +1,12 @@
 // controllers/predictController.js
 
+const axios = require("axios"); // Import axios to make the API call
 const Image = require("../models/Image");
 const Prediction = require("../models/Prediction");
 const suggestionsData = require("../data.json"); 
 
 /**
  * Controller function to get a prediction for an uploaded image.
- * This function expects an imageId from the route parameters.
  */
 exports.getPrediction = async (req, res) => {
     const { imageId } = req.params;
@@ -18,16 +18,15 @@ exports.getPrediction = async (req, res) => {
             return res.status(404).json({ success: false, message: "Image not found." });
         }
 
-        const imageUrl = image.url;
+        const imageUrl = image.url; // Get the Cloudinary URL
 
-        // **Step 2: Mock AI model response**
-        const mlResponse = {
-            data: {
-                prediction: { disease: "Bacterial Blight", confidence: 0.92 },
-            },
-        };
+        // **Step 2: Make a real API call to your AI model**
+        const mlResponse = await axios.post(process.env.ML_API_URL, {
+            image_url: imageUrl,
+        });
 
-        // Step 3: Extract prediction data from the mocked response
+        // Step 3: Extract prediction data from the AI model's response
+        // NOTE: You may need to adjust the structure below depending on the exact format of the ML API's response
         const { disease, confidence } = mlResponse.data.prediction;
 
         // Step 4: Find the corresponding suggestion from your local data.json file
@@ -45,7 +44,7 @@ exports.getPrediction = async (req, res) => {
         // Step 6: Respond with the prediction and its suggestion
         res.status(200).json({
             success: true,
-            message: "Prediction successful (mock).",
+            message: "Prediction successful.",
             prediction: newPrediction,
             suggestion: {
                 disease: disease,
@@ -53,6 +52,7 @@ exports.getPrediction = async (req, res) => {
             },
         });
     } catch (error) {
+        // Handle all errors gracefully
         console.error("❌ Error in getPrediction:", error.stack);
         res.status(500).json({ 
             success: false, 
