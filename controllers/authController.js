@@ -45,3 +45,45 @@ exports.signin = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to sign in." });
     }
 };
+
+// Add this new function to your authController.js file
+
+// Middleware to protect routes
+const auth = (req, res, next) => {
+    try {
+        const token = req.headers.authorization.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ message: "No token, authorization denied." });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded; // Add user payload to the request
+        next();
+    } catch (error) {
+        res.status(401).json({ message: "Token is not valid." });
+    }
+};
+
+// Handles fetching a user's profile
+exports.getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+        res.status(200).json({
+            success: true,
+            user: {
+                id: user.id,
+                fullname: user.fullname,
+                email: user.email,
+                phone: user.phone
+            }
+        });
+    } catch (error) {
+        console.error("Profile fetch error:", error.stack);
+        res.status(500).json({ success: false, message: "Failed to fetch user profile." });
+    }
+};
+
+// Don't forget to export the auth middleware as well
+exports.auth = auth;

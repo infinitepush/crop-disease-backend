@@ -7,7 +7,12 @@ class User {
         const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         return result.rows[0];
     }
+// Add this new function to your models/User.js file
 
+static async findById(id) {
+    const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    return result.rows[0];
+}
     // Creates a new user in the database
     static async create(fullname, email, passwordHash, phone) {
         const result = await pool.query(
@@ -17,5 +22,6 @@ class User {
         return result.rows[0];
     }
 }
+
 
 module.exports = User;
