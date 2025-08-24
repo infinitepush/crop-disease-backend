@@ -1,7 +1,9 @@
     // index.js
     require("dotenv").config();
     const express = require("express");
-    const cors = require("cors");
+    const cors = require('cors');
+    app.use(cors()); // allow all origins, or specify your frontend domain
+
     const pool = require("./config/db");
 
     const uploadRoutes = require("./routes/upload");
