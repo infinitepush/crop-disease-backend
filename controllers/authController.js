@@ -102,6 +102,24 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to change password." });
     }
 };
+// Add this new function to the file
+exports.updateProfile = async (req, res) => {
+    try {
+        const { fullname, phone } = req.body;
+        const userId = req.user.id; // User ID from the JWT token
+
+        const updatedUser = await User.updateProfile(userId, { fullname, phone });
+
+        res.status(200).json({ success: true, message: "Profile updated successfully.", user: updatedUser });
+    } catch (error) {
+        console.error("Update profile error:", error.stack);
+        res.status(500).json({ success: false, message: "Failed to update profile." });
+    }
+};
+
+// Add this function to the exports at the bottom
+// exports.updateProfile = updateProfile;
+
 
 // Update the exports at the bottom
 // exports.signin = signin;

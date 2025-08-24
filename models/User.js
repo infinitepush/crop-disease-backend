@@ -16,7 +16,14 @@ static async updatePassword(id, passwordHash) {
     );
     return result.rows[0];
 }
-
+// Add this new function to the User.js model
+static async updateProfile(id, { fullname, phone }) {
+    const result = await pool.query(
+        "UPDATE users SET fullname = $1, phone = $2 WHERE id = $3 RETURNING *",
+        [fullname, phone, id]
+    );
+    return result.rows[0];
+}
 static async findById(id) {
     const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
     return result.rows[0];
