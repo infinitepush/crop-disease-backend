@@ -8,6 +8,14 @@ class User {
         return result.rows[0];
     }
 // Add this new function to your models/User.js file
+// Add this to your User.js model
+static async updatePassword(id, passwordHash) {
+    const result = await pool.query(
+        "UPDATE users SET password_hash = $1 WHERE id = $2 RETURNING *",
+        [passwordHash, id]
+    );
+    return result.rows[0];
+}
 
 static async findById(id) {
     const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);

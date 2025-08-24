@@ -85,5 +85,28 @@ exports.getUserProfile = async (req, res) => {
     }
 };
 
+// Add this new function to the file
+exports.changePassword = async (req, res) => {
+    try {
+        const { newPassword } = req.body;
+        const userId = req.user.id; // User ID from the JWT token
+
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(newPassword, salt);
+        
+        await User.updatePassword(userId, passwordHash);
+
+        res.status(200).json({ success: true, message: "Password updated successfully." });
+    } catch (error) {
+        console.error("Change password error:", error.stack);
+        res.status(500).json({ success: false, message: "Failed to change password." });
+    }
+};
+
+// Update the exports at the bottom
+// exports.signin = signin;
+// exports.auth = auth;
+// exports.getUserProfile = getUserProfile;
+// exports.changePassword = changePassword;
 // Don't forget to export the auth middleware as well
 exports.auth = auth;
