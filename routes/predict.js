@@ -1,6 +1,5 @@
 const express = require("express");
 const multer = require("multer");
-const multer = require("multer");
 
 router.post("/predict-back", upload.single("file"), createPrediction);
 
