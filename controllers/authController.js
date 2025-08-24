@@ -1,11 +1,23 @@
-// controllers/authController.js
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
-// Handles user sign-up
+const auth = (req, res, next) => {
+    try {
+        const token = req.headers.authorization.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ message: "No token, authorization denied." });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(401).json({ message: "Token is not valid." });
+    }
+};
+
 exports.signup = async (req, res) => {
     try {
         const { fullname, email, password, phone } = req.body;
@@ -15,10 +27,7 @@ exports.signup = async (req, res) => {
         }
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
-
-        // **CORRECTED:** Pass the data as individual arguments to the User.create method.
         const newUser = await User.create(fullname, email, passwordHash, phone);
-
         res.status(201).json({ success: true, message: "User created successfully.", user: newUser });
     } catch (error) {
         console.error("Signup error:", error.stack);
@@ -26,7 +35,6 @@ exports.signup = async (req, res) => {
     }
 };
 
-// Handles user sign-in
 exports.signin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -46,24 +54,6 @@ exports.signin = async (req, res) => {
     }
 };
 
-// Add this new function to your authController.js file
-
-// Middleware to protect routes
-const auth = (req, res, next) => {
-    try {
-        const token = req.headers.authorization.split(" ")[1];
-        if (!token) {
-            return res.status(401).json({ message: "No token, authorization denied." });
-        }
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded; // Add user payload to the request
-        next();
-    } catch (error) {
-        res.status(401).json({ message: "Token is not valid." });
-    }
-};
-
-// Handles fetching a user's profile
 exports.getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -85,31 +75,11 @@ exports.getUserProfile = async (req, res) => {
     }
 };
 
-// Add this new function to the file
-exports.changePassword = async (req, res) => {
-    try {
-        const { newPassword } = req.body;
-        const userId = req.user.id; // User ID from the JWT token
-
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(newPassword, salt);
-        
-        await User.updatePassword(userId, passwordHash);
-
-        res.status(200).json({ success: true, message: "Password updated successfully." });
-    } catch (error) {
-        console.error("Change password error:", error.stack);
-        res.status(500).json({ success: false, message: "Failed to change password." });
-    }
-};
-// Add this new function to the file
 exports.updateProfile = async (req, res) => {
     try {
         const { fullname, phone } = req.body;
-        const userId = req.user.id; // User ID from the JWT token
-
+        const userId = req.user.id;
         const updatedUser = await User.updateProfile(userId, { fullname, phone });
-
         res.status(200).json({ success: true, message: "Profile updated successfully.", user: updatedUser });
     } catch (error) {
         console.error("Update profile error:", error.stack);
@@ -117,14 +87,18 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// Add this function to the exports at the bottom
-// exports.updateProfile = updateProfile;
+exports.changePassword = async (req, res) => {
+    try {
+        const { newPassword } = req.body;
+        const userId = req.user.id;
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(newPassword, salt);
+        await User.updatePassword(userId, passwordHash);
+        res.status(200).json({ success: true, message: "Password updated successfully." });
+    } catch (error) {
+        console.error("Change password error:", error.stack);
+        res.status(500).json({ success: false, message: "Failed to change password." });
+    }
+};
 
-
-// Update the exports at the bottom
-// exports.signin = signin;
-// exports.auth = auth;
-// exports.getUserProfile = getUserProfile;
-// exports.changePassword = changePassword;
-// Don't forget to export the auth middleware as well
 exports.auth = auth;
