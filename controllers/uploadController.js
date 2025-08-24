@@ -1,8 +1,6 @@
 // Import necessary modules
 const cloudinary = require("../config/cloudinary");
-// The path to your Image model, assuming it's a Mongoose or Sequelize model.
-// The `models` directory is one level up from `controllers`.
-const Image = require("../models/Image"); 
+const Image = require("../models/Image");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
@@ -32,15 +30,14 @@ exports.uploadImage = async (req, res) => {
         // The Cloudinary URL is available on req.file.path after multer completes
         const imageUrl = req.file.path;
 
-        // **FIX:** The `create` method expects an object with the data.
-        // Your `images` table has a 'url' column, so pass the URL in an object.
-        const newImage = await Image.create({ url: imageUrl });
+        // **CORRECTED LINE:** Pass the URL as a plain string.
+        const newImage = await Image.create(imageUrl);
 
         // Respond with a success message and the newly created image record
         res.status(200).json({
             success: true,
             message: "Image uploaded successfully",
-            image: newImage 
+            image: newImage
         });
     } catch (error) {
         // Handle any errors that occur during the upload or database save
@@ -54,5 +51,4 @@ exports.uploadImage = async (req, res) => {
 };
 
 // Export the multer middleware to be used in your Express routes
-// e.g., router.post('/upload', uploadController.uploadMiddleware, uploadController.uploadImage);
 exports.uploadMiddleware = upload.single("image");
