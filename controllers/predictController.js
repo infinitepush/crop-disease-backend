@@ -22,7 +22,7 @@ exports.getPrediction = async (req, res) => {
 
         // **Step 2: Make a real API call to your AI model**
         const mlResponse = await axios.post(process.env.ML_API_URL, {
-            image_url: imageUrl,
+            url: imageUrl,
         });
 
         // Step 3: Extract prediction data from the AI model's response
